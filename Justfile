@@ -123,6 +123,7 @@ build $target_image=image_name $tag=default_tag:
 
     # This actually builds the image!
     PODMAN_BUILD_ARGS=("${BUILD_ARGS[@]}" "${LABELS[@]}" --pull=newer --tag "${target_image}:${tag}" --file Containerfile)
+    PODMAN_BUILD_ARGS+=("--build-arg" "IMAGE_VARIANT=${IMAGE_VARIANT:-gnome}")
 
     podman build "${PODMAN_BUILD_ARGS[@]}" .
 

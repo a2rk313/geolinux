@@ -1,0 +1,47 @@
+#!/bin/bash
+# Installs the desktop core apps as Flathub flatpaks. Runs on every boot via
+# geolinux-flatpak-setup.service; already-installed apps exit fast, failures
+# retry on the next boot. The app set is chosen by which display manager the
+# image ships (gdm = GNOME, plasmalogin = KDE).
+set -u
+
+flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo || exit 0
+
+APPS=()
+if rpm -q gdm >/dev/null 2>&1; then
+  APPS+=(
+    org.gnome.baobab
+    org.gnome.Calendar
+    org.gnome.Calculator
+    org.gnome.Characters
+    org.gnome.clocks
+    org.gnome.Connections
+    org.gnome.Contacts
+    org.gnome.Decibels
+    org.gnome.font-viewer
+    org.gnome.Logs
+    org.gnome.Loupe
+    org.gnome.Maps
+    org.gnome.Papers
+    org.gnome.Showtime
+    org.gnome.Snapshot
+    org.gnome.SimpleScan
+    org.gnome.TextEditor
+    org.gnome.Weather
+  )
+elif rpm -q plasma-login-manager >/dev/null 2>&1; then
+  APPS+=(
+    org.kde.ark
+    org.kde.dolphin
+    org.kde.filelight
+    org.kde.kcharselect
+    org.kde.kfind
+    org.kde.kwrite
+    org.kde.kwalletmanager5
+  )
+fi
+
+for app in "${APPS[@]}"; do
+  flatpak install -y --system flathub "$app" \
+    || echo "WARNING: flatpak install $app failed; retrying on next boot" >&2
+done
