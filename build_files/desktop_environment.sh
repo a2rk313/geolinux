@@ -53,7 +53,11 @@ case "${IMAGE_VARIANT:-gnome}" in
     # geolinux-flatpak-setup.service), not RPMs — drop the comps RPM versions.
     # (spectacle, kdebugsettings, kde-partitionmanager, kdialog have no Flathub
     # builds and stay; konsole/discover/plasma-systemmonitor are integration, stay)
-    dnf5 remove -y ark dolphin filelight kcharselect kfind kwrite kwalletmanager5
+    # akonadi-server + akonadi-server-mysql = PIM storage daemon + a full
+    # MariaDB server; only kdepim apps need it, no place in a base image.
+    dnf5 remove -y \
+      akonadi-server akonadi-server-mysql \
+      ark dolphin filelight kcharselect kfind kwrite kwalletmanager5
     systemctl enable plasmalogin.service geolinux-flatpak-setup.service
     ;;
   *)
