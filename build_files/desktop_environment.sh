@@ -35,13 +35,16 @@ case "${IMAGE_VARIANT:-gnome}" in
     dnf5 group install -y gnome-desktop
     # GNOME core apps ship as Flathub flatpaks (installed on boot by
     # geolinux-flatpak-setup.service), not RPMs — drop the comps RPM versions.
+    # gnome-boxes (drags in the whole qemu/libvirt/spice stack), rygel (DLNA
+    # server) and gnome-user-share are non-minimal extras and aren't shipped.
     # (flatpak support is built into gnome-software itself on F45, no plugin pkg)
     dnf5 remove -y \
-      baobab decibels gnome-calculator gnome-calendar gnome-characters \
-      gnome-clocks gnome-connections gnome-contacts gnome-font-viewer \
-      gnome-logs gnome-maps gnome-text-editor gnome-weather loupe \
+      baobab decibels gnome-boxes gnome-calculator gnome-calendar \
+      gnome-characters gnome-clocks gnome-connections gnome-contacts \
+      gnome-font-viewer gnome-logs gnome-maps gnome-text-editor gnome-weather \
+      gnome-user-share loupe \
       papers papers-libs papers-previewer papers-thumbnailer papers-nautilus \
-      showtime snapshot simple-scan
+      rygel showtime snapshot simple-scan
     systemctl enable gdm.service geolinux-flatpak-setup.service
     ;;
   kde)
