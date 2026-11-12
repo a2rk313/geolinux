@@ -10,10 +10,16 @@ set -ouex pipefail
 # https://mirrors.rpmfusion.org/mirrorlist?path=free/fedora/updates/43/x86_64/repoview/index.html&protocol=https&redirect=1
 
 # this installs a package from fedora repos
-dnf5 install -y tmux
+# just runs the opt-in GIS recipes on the installed system (60-gis.just);
+# git and slirp4netns are runtime prerequisites for brew and cpak respectively
+dnf5 install -y just git slirp4netns tmux
 
 # apply the system_files overlay into the image (empty dir = no-op)
 cp -a /ctx/system_files/. /
+
+# ship the opt-in GIS recipes so `geolinux-gis` works on the installed system
+install -d /usr/share/geolinux/build_files
+install -m644 /ctx/60-gis.just /ctx/gis-helpers.sh /usr/share/geolinux/build_files/
 
 # Use a COPR Example:
 #

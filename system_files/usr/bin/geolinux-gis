@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+# Run the opt-in GIS recipes shipped in /usr/share/geolinux.
+exec just --justfile /usr/share/geolinux/Justfile "$@"

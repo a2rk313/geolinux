@@ -1,0 +1,3 @@
+# Opt-in GIS recipes shipped with geolinux.
+# Run: geolinux-gis --list
+import "build_files/60-gis.just"
