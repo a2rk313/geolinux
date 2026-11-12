@@ -1,6 +1,7 @@
 # ─── GIS Workstation ───────────────────────────────────────────────────────────
-# Opt-in GIS / remote-sensing recipes. Everything installs in user space
-# (brew, cpak, venvs, ~/.local/bin) so the bootc image stays minimal.
+# QGIS is preinstalled (Flatpak) and GRASS is bundled with it; SAGA and
+# everything else here is opt-in and runs in user space (brew, cpak, venvs,
+# ~/.local/bin) so the bootc image stays minimal.
 # Based on the geonix recipe set, rewritten away from rpm-ostree layering.
 
 # Show which optional recipes have been installed
@@ -8,7 +9,10 @@
 status:
     #!/usr/bin/bash
     source "{{ justfile_directory() }}/build_files/gis-helpers.sh"
-    echo "=== geolinux — installed GIS recipes ==="
+    echo "=== geolinux — GIS workstation ==="
+    echo "  Default: QGIS + GRASS (Flatpak)"
+    echo ""
+    echo "  Optional recipes:"
     if [ ! -d "${gis_state_dir}" ] || [ -z "$(ls -A "${gis_state_dir}" 2>/dev/null)" ]; then
         echo "  No optional recipes installed yet."
         echo "  Run 'just --list' to see available recipes."
@@ -21,32 +25,27 @@ status:
 
 # ─── Desktop GIS & remote sensing ──────────────────────────────────────────────
 
-# QGIS desktop GIS, with GRASS 8.4 bundled as a Processing provider
+# QGIS desktop GIS (preinstalled by default; repairs a failed boot install)
 [group('GIS Workstation')]
 install-qgis:
     #!/usr/bin/bash
     set -euo pipefail
-    source "{{ justfile_directory() }}/build_files/gis-helpers.sh"
-    echo "=== Installing QGIS (cpak, Flathub build) ==="
-    gis_cpak
-    cpak install --flatpak org.qgis.qgis --yes
-    gis_mark qgis
+    echo "=== Installing QGIS (Flathub) ==="
+    flatpak install -y --system flathub org.qgis.qgis/x86_64/stable
     echo ""
     echo "QGIS installed."
-    echo "  Launch from the app menu (cpak registers the entry)."
+    echo "  Launch from the app menu."
     echo "  GRASS 8.4 is bundled as a QGIS provider; no separate GRASS install."
+    echo "  SAGA is opt-in: just install-saga (cpak container)."
     echo "  Plugins: QGIS > Plugins > Manage and Install Plugins (inside the app)."
 
-# CloudCompare point-cloud viewer (LAS/LAZ, E57, PLY, OBJ, SHP)
+# CloudCompare point-cloud viewer (opt-in, Flathub)
 [group('GIS Workstation')]
 install-cloudcompare:
     #!/usr/bin/bash
     set -euo pipefail
-    source "{{ justfile_directory() }}/build_files/gis-helpers.sh"
-    echo "=== Installing CloudCompare (cpak, Flathub build) ==="
-    gis_cpak
-    cpak install --flatpak org.cloudcompare.CloudCompare --yes
-    gis_mark cloudcompare
+    echo "=== Installing CloudCompare (Flathub) ==="
+    flatpak install -y --system flathub org.cloudcompare.CloudCompare
     echo "CloudCompare installed. Launch from the app menu."
 
 # GDAL, PROJ, GEOS, PDAL and friends (CLI + shared libraries)
@@ -105,24 +104,28 @@ update-whitebox:
         echo "Newer release available — re-run 'just install-whitebox' to fetch it."
     fi
 
-# SAGA GIS in a cpak Fedora environment (CLI only: the environment has no display socket)
+# SAGA GIS from the repo's cpak package, with a ~/.local/bin/saga_cmd wrapper
 [group('GIS Workstation')]
 install-saga:
     #!/usr/bin/bash
     set -euo pipefail
     source "{{ justfile_directory() }}/build_files/gis-helpers.sh"
-    echo "=== Installing SAGA GIS (cpak Fedora environment) ==="
-    gis_cpak_fedora_env
-    cpak environment shell --environment gis --command /bin/bash -- -lc '
-      set -euo pipefail
-      dnf install -y dnf5-plugins
-      dnf copr enable -y megger/saga
-      dnf install -y saga
-    '
+    echo "=== Installing SAGA GIS (cpak package) ==="
+    # the shipped justfile has no repo_organization, so the origin is literal
+    saga_origin="github.com/a2rk313/geolinux"
+    gis_cpak
+    cpak install --yes "${saga_origin}"
+    mkdir -p "${HOME}/.local/bin"
+    printf '%s\n' \
+        '#!/usr/bin/bash' \
+        '# SAGA runs in its cpak container, not on the host root' \
+        "exec cpak run ${saga_origin} saga_cmd -- \"\$@\"" \
+        > "${HOME}/.local/bin/saga_cmd"
+    chmod +x "${HOME}/.local/bin/saga_cmd"
     gis_mark saga
     echo ""
-    echo "SAGA installed (CLI only — the cpak environment exposes no display)."
-    echo "  Run: cpak environment shell --environment gis --command saga_cmd"
+    echo "SAGA installed: saga_cmd (~/.local/bin, already on PATH) and the GUI app entry."
+    echo "  First run pulls the SAGA image (~700 MB)."
 
 # Orfeo Toolbox CLI apps via the official container (its COPR has no Fedora 44 repo)
 [group('GIS Workstation')]

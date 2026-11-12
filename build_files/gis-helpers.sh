@@ -57,12 +57,3 @@ gis_cpak() {
   install -Dm755 "${tmp}/cpak-storaged" "${HOME}/.local/bin/cpak-storaged"
   rm -rf "${tmp}"
 }
-
-# Ensure the shared rootless Fedora environment used for SAGA/OTB exists.
-gis_cpak_fedora_env() {
-  gis_cpak
-  cpak install --yes github.com/containerpak/fedora
-  if ! cpak environment inspect --environment gis >/dev/null 2>&1; then
-    cpak environment create --name gis --origin github.com/containerpak/fedora
-  fi
-}

@@ -54,15 +54,17 @@ case "${IMAGE_VARIANT:-gnome}" in
     systemctl enable gdm.service geolinux-flatpak-setup.service
     ;;
   kde)
-    dnf5 group install -y kde-desktop
+    # akonadi-server + akonadi-server-mysql = PIM storage daemon + a full
+    # MariaDB server; only kdepim apps need it, no place in a base image.
+    # Exclude at install time: nothing kept needs them, and it avoids pulling
+    # MariaDB/pyside6/Qt3D only to delete them again.
+    dnf5 --exclude=akonadi-server --exclude=akonadi-server-mysql \
+      group install -y kde-desktop
     # KDE apps ship as Flathub flatpaks (installed on boot by
     # geolinux-flatpak-setup.service), not RPMs — drop the comps RPM versions.
     # (spectacle, kdebugsettings, kde-partitionmanager, kdialog have no Flathub
     # builds and stay; konsole/discover/plasma-systemmonitor are integration, stay)
-    # akonadi-server + akonadi-server-mysql = PIM storage daemon + a full
-    # MariaDB server; only kdepim apps need it, no place in a base image.
     dnf5 remove -y \
-      akonadi-server akonadi-server-mysql \
       ark dolphin filelight kcharselect kfind kwrite kwalletmanager5
     systemctl enable plasmalogin.service geolinux-flatpak-setup.service
     ;;

@@ -11,6 +11,9 @@ on:
       - main
     paths-ignore:
       - '**/README.md'
+      - 'cpak.json'                    # pinned by the SAGA cpak image workflow
+      - 'saga/**'
+      - '.github/workflows/saga-image.yml'
   workflow_dispatch:
 
 env:

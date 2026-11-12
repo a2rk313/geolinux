@@ -1,5 +1,5 @@
 [Unit]
-Description=Geolinux: install GNOME core apps from Flathub
+Description=Geolinux: install default desktop apps from Flathub
 Wants=network-online.target
 After=network-online.target
 

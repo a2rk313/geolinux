@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+# QGIS runs from the Flathub app, which bundles GRASS, GDAL and PROJ.
+exec flatpak run org.qgis.qgis "$@"

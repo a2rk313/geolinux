@@ -1,0 +1,56 @@
+---
+name: Build SAGA cpak image
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'saga/**'
+      - '.github/workflows/saga-image.yml'
+  workflow_dispatch:
+
+env:
+  IMAGE: ghcr.io/${{ github.repository_owner }}/geolinux-saga
+  TAG: "9.9.3"
+
+jobs:
+  build_push:
+    name: Build and push the SAGA cpak image
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Build image
+        run: podman build -t "${IMAGE}:${TAG}" -f saga/Containerfile saga
+
+      - name: Log in to ghcr.io
+        run: |
+          podman login ghcr.io -u "${{ github.actor }}" \
+            --password-stdin <<< "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Push image and record digest
+        run: podman push "${IMAGE}:${TAG}" --digestfile "${RUNNER_TEMP}/digest.txt"
+
+      # cpak manifest v3 only accepts a digest-pinned image, so the build pins
+      # its own output back into the manifest.
+      - name: Pin the pushed digest in cpak.json
+        run: |
+          digest="$(cat "${RUNNER_TEMP}/digest.txt")"
+          jq --arg digest "$digest" \
+            '.image |= sub("@sha256:[A-Fa-f0-9]{64}$"; "@\($digest)")' \
+            cpak.json > cpak.json.tmp
+          mv cpak.json.tmp cpak.json
+          git diff --stat cpak.json
+
+      - name: Commit the pinned digest
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git diff --quiet cpak.json && exit 0
+          git commit -m "Pin SAGA cpak image digest" cpak.json
+          git push

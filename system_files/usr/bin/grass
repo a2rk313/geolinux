@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+# GRASS runs inside the QGIS Flatpak; /etc/profile.d points GRASSBIN here.
+exec flatpak run --command=grass org.qgis.qgis "$@"

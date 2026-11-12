@@ -460,5 +460,5 @@ format:
     # Run shfmt on all Bash scripts
     find . -iname "*.sh" -type f -exec shfmt --write "{}" ';'
 
-# Opt-in GIS / remote-sensing recipes (brew, cpak and user-space venvs)
+# GIS / remote-sensing recipes (QGIS + GRASS wrappers, opt-in brew, cpak and venvs)
 import "build_files/60-gis.just"

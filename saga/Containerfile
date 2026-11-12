@@ -1,0 +1,11 @@
+# SAGA GIS as a cpak package image, built on the cpak project's Ubuntu 26.04
+# base. Ubuntu universe ships SAGA 9.9.3, so no compiler toolchain is needed.
+FROM ghcr.io/containerpak/ubuntu-cpak@sha256:ba62c2eb330c4d4a68f60e5ef1edec36bd1a11853de142d6454fa425a8d47732
+
+LABEL org.opencontainers.image.source="https://github.com/a2rk313/geolinux" \
+      org.opencontainers.image.title="geolinux-saga" \
+      org.opencontainers.image.description="SAGA GIS for the geolinux cpak package"
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends saga \
+ && rm -rf /var/lib/apt/lists/*

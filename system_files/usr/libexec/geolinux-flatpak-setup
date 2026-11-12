@@ -1,8 +1,9 @@
 #!/bin/bash
-# Installs the desktop core apps as Flathub flatpaks. Runs on every boot via
-# geolinux-flatpak-setup.service; already-installed apps exit fast, failures
-# retry on the next boot. The app set is chosen by which display manager the
-# image ships (gdm = GNOME, plasmalogin = KDE).
+# Installs the desktop core apps and QGIS as Flathub flatpaks. Runs on every
+# boot via geolinux-flatpak-setup.service; already-installed apps exit fast,
+# failures retry on the next boot. The desktop set is chosen by which display
+# manager the image ships (gdm = GNOME, plasmalogin = KDE); QGIS is installed on
+# both editions. GRASS is bundled with QGIS; SAGA is opt-in (cpak container).
 set -u
 
 flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo || exit 0
@@ -40,6 +41,12 @@ elif rpm -q plasma-login-manager >/dev/null 2>&1; then
     org.kde.kwalletmanager5
   )
 fi
+
+# Default desktop GIS — QGIS bundles GRASS 8.4, GDAL and PROJ. Everything else
+# is opt-in: geolinux-gis --list (SAGA runs in a cpak container)
+APPS+=(
+  org.qgis.qgis/x86_64/stable
+)
 
 for app in "${APPS[@]}"; do
   flatpak install -y --system flathub "$app" \
