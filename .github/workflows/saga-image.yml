@@ -36,16 +36,6 @@ jobs:
       - name: Push image and record digest
         run: podman push "${IMAGE}:${TAG}" --digestfile "${RUNNER_TEMP}/digest.txt"
 
-      # GHCR packages pushed with GITHUB_TOKEN start private; cpak needs to pull
-      # the image without credentials.
-      - name: Make the package public
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh api --method PATCH "/user/packages/container/${IMAGE##*/}" \
-            -f visibility=public
-          echo "✓ ${IMAGE} is public"
-
       # cpak manifest v3 only accepts a digest-pinned image, so the build pins
       # its own output back into the manifest.
       - name: Pin the pushed digest in cpak.json
