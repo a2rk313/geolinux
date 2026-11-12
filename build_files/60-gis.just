@@ -113,7 +113,13 @@ install-saga:
     echo "=== Installing SAGA GIS (cpak package) ==="
     # the shipped justfile has no repo_organization, so the origin is literal
     saga_origin="github.com/a2rk313/geolinux"
+    # the package repo is private: cpak reads the gh session for its manifest
+    command -v gh >/dev/null || {
+        echo "gh (GitHub CLI) is required: the SAGA package repo is private" >&2
+        exit 1
+    }
     gis_cpak
+    cpak auth login "${saga_origin}" --github
     cpak install --yes "${saga_origin}"
     mkdir -p "${HOME}/.local/bin"
     printf '%s\n' \
