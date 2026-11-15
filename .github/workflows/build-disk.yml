@@ -85,6 +85,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
+      # the images are private packages; the action pulls them with sudo podman
+      - name: Log in to the image registry
+        run: |
+          sudo podman login "${IMAGE_REGISTRY}" -u "${{ github.actor }}" \
+            --password-stdin <<< "${{ secrets.GITHUB_TOKEN }}"
+
       - name: Build disk images
         id: build
         uses: osbuild/bootc-image-builder-action@028e4d28330efe546229eb9cb52aee78174d2347 # main
