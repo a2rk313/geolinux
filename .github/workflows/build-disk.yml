@@ -23,6 +23,15 @@ on:
         options:
           - gnome
           - kde
+      disk-type:
+        description: "Disk image type to build"
+        required: true
+        default: qcow2
+        type: choice
+        options:
+          - qcow2
+          - anaconda-iso
+          - all
   pull_request:
     branches:
       - main
@@ -50,7 +59,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        disk-type: ["qcow2", "anaconda-iso"]
+        # manual runs pick one type (default qcow2); PR runs default to qcow2
+        disk-type: ${{ fromJSON(inputs['disk-type'] == 'all' && '["qcow2","anaconda-iso"]' || format('["{0}"]', inputs['disk-type'] || 'qcow2')) }}
     permissions:
       contents: read
       packages: read
