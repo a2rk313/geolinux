@@ -106,14 +106,13 @@ jobs:
 
       # Artifacts are downloaded far more often than they are built, so store
       # the images zstd-compressed instead of relying on the artifact zip.
+      # BIB writes one subdirectory per type (output/qcow2/disk.qcow2).
       - name: Compress disk images (zstd level 3)
         run: |
           cd "${{ steps.build.outputs.output-directory }}"
-          for image in *.qcow2 *.iso *.raw *.vmdk; do
-            [ -f "${image}" ] || continue
-            zstd -T0 -3 --rm "${image}"
-          done
-          ls -lh
+          find . -type f \( -name '*.qcow2' -o -name '*.iso' -o -name '*.raw' -o -name '*.vmdk' \) \
+            -exec zstd -T0 -3 --rm {} +
+          find . -type f -name '*.zst' -exec ls -lh {} +
 
       - name: Upload disk images and Checksum to Job Artifacts
         if: inputs.upload-to-s3 != true && github.event_name != 'pull_request'
