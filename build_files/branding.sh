@@ -84,17 +84,6 @@ else
   echo "Logomenu extension not present — skipping GNOME logo-menu override"
 fi
 
-# --- KDE Kickoff icon override (when Plasma's kickoff config is present) ---
-# Plasma installs the applet under /usr/share/plasma on some releases and
-# /usr/share/plasma6 on others; brand whichever exists.
-for KICKOFF_XML in \
-  /usr/share/plasma/plasmoids/org.kde.plasma.kickoff/contents/config/main.xml \
-  /usr/share/plasma6/plasmoids/org.kde.plasma.kickoff/contents/config/main.xml; do
-  [[ -f "$KICKOFF_XML" ]] || continue
-  sed -i 's|<default>start-here-kde</default>|<default>geolinux-logo</default>|g' "$KICKOFF_XML"
-  echo "KDE Kickoff icon overridden (${KICKOFF_XML})"
-done
-
 # --- GDM / FEDORA LOGO REPLACEMENTS ---
 PIXMAPS="/usr/share/pixmaps"
 LOGO_128="/ctx/logo/logo_small_128.png"
