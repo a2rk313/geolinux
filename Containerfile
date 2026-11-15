@@ -2,6 +2,7 @@
 FROM scratch AS ctx
 COPY build_files /
 COPY system_files /system_files
+COPY logo /logo
 
 # LAYER ORDER RULE: least-frequently-changing layers first, most-frequent last, so
 # routine edits only rebuild the tail of this file. Base image and one-time fixups
@@ -39,6 +40,12 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
   --mount=type=cache,dst=/var/log \
   --mount=type=tmpfs,dst=/tmp \
   /ctx/desktop_environment.sh
+
+### BRANDING
+## os-release identity, MOTD, logos, boot splash and menu icons, after the
+## desktop packages so their theme and applet files can be branded too.
+RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
+  /ctx/branding.sh
 
 ### LINTING
 ## Verify final image and contents are correct.
