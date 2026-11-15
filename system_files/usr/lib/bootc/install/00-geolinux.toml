@@ -1,0 +1,5 @@
+# Root filesystem for disk images built from this image by bootc-image-builder.
+# fedora-bootc ships an empty /usr/lib/bootc/install, and BIB refuses to build
+# without a default root fs when the disk config has no partition table.
+[install]
+root-fs-type = "xfs"
