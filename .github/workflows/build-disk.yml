@@ -44,7 +44,9 @@ concurrency:
 jobs:
   build:
     name: Build disk images
-    runs-on: ${{ inputs.platform == 'amd64' && 'ubuntu-26.04' || 'ubuntu-26.04-arm' }}
+    # ubuntu-26.04 runners ship kernel 7.0, where osbuild's MountGuard fails
+    # with EACCES (osbuild#2579); the 6.17 kernel on 24.04 builds the images.
+    runs-on: ${{ inputs.platform == 'amd64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
     strategy:
       fail-fast: false
       matrix:

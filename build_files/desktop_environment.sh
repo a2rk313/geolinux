@@ -81,3 +81,12 @@ systemctl set-default graphical.target
 # must stay in this same RUN — a later layer can only tombstone, not shrink
 dnf5 autoremove -y
 dnf5 clean all
+
+# Fedora 45 moved its repo files to /usr/share/dnf5/repos.d and leaves
+# /etc/yum.repos.d empty. bootc-image-builder depsolves the installer ISO from
+# /etc/yum.repos.d only, so expose the repo files there too.
+for repo in /usr/share/dnf5/repos.d/*.repo; do
+  [ -e "$repo" ] || continue
+  name=$(basename "$repo")
+  [ -e "/etc/yum.repos.d/$name" ] || ln -s "../../usr/share/dnf5/repos.d/$name" "/etc/yum.repos.d/$name"
+done
