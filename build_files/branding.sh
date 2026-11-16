@@ -1,6 +1,6 @@
 #!/usr/bin/bash
-# Image branding, borrowed from the geonix project: os-release identity, MOTD,
-# boot splash, menu icons and the GDM logo.
+# Image branding: os-release identity, MOTD, boot splash, menu icons and the
+# GDM logo.
 set -ouex pipefail
 
 IMAGE_PRETTY_NAME="Geolinux"

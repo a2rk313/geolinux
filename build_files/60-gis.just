@@ -2,7 +2,6 @@
 # QGIS is preinstalled (Flatpak) and GRASS is bundled with it; SAGA and
 # everything else here is opt-in and runs in user space (brew, cpak, venvs,
 # ~/.local/bin) so the bootc image stays minimal.
-# Based on the geonix recipe set, rewritten away from rpm-ostree layering.
 
 # Show which optional recipes have been installed
 [group('GIS Workstation')]
