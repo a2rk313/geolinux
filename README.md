@@ -4,7 +4,7 @@
   <img src="logo/logo.png" alt="Geolinux Logo" width="200"/>
 </p>
 
-A Fedora bootc distro for the people who use GIS and Remote Sensing to make the world a better place. Built on [ublue-os/image-template](https://github.com/ublue-os/image-template) and [Fedora bootc](https://github.com/bootc-dev/bootc), with branding and the GIS recipe set adapted from the [geonix](https://github.com/a2rk313/geonix) project.
+A Fedora bootc distro for the people who use GIS and Remote Sensing to make the world a better place. Built on [ublue-os/image-template](https://github.com/ublue-os/image-template) and [Fedora bootc](https://github.com/bootc-dev/bootc).
 
 The base image stays minimal: QGIS and GRASS are Flatpak apps and SAGA runs in a container, so the OS layer is small and updates stay fast. Everything heavier (GDAL/PROJ, PostGIS, Jupyter, ML stacks) is opt-in and lives in user space.
 
