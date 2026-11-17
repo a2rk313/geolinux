@@ -4,7 +4,7 @@
   "name": "SAGA GIS",
   "description": "System for Automated Geoscientific Analyses.",
   "version": "9.9.3",
-  "image": "ghcr.io/a2rk313/geolinux-saga@sha256:9b48dc63e1d45a8ea6b80c60ffb37288b57f33a2a1eee229a83bef344f4751db",
+  "image": "ghcr.io/a2rk313/geolinux-saga@sha256:be1e18efc3f706ee228094f5cb613739790baa4367cecc79b4e5db4faa326726",
   "binaries": [
     "/usr/bin/saga_cmd",
     "/usr/bin/saga_gui"
