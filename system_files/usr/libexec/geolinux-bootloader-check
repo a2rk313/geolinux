@@ -1,0 +1,10 @@
+#!/usr/bin/bash
+# ExecCondition for bootloader-update.service: skip bootupctl only when the
+# installed image recorded no version, which bootupd 0.3.2 cannot parse
+# (coreos/bootupd#1166). Any other state returns 0 and bootupctl runs.
+set -u
+
+aleph=/sysroot/.bootc-aleph.json
+[[ -f $aleph ]] || exit 0
+
+exec python3 -c 'import json, sys; sys.exit(0 if json.load(open(sys.argv[1])).get("version") else 1)' "$aleph"
