@@ -82,7 +82,7 @@ Boot the qcow2 in your VM manager of choice, or run it locally with `just run-vm
 
 - **QGIS** — launch `qgis` or pick it from the app menu. Plugins install from inside QGIS (*Plugins → Manage and Install Plugins*).
 - **GRASS** — `grass` on the command line, or the GRASS provider inside QGIS.
-- **SAGA** — the manifest repo is private, so log in to GitHub first, then:
+- **SAGA** — the SAGA container image is private, so log in to GitHub first, then:
 
   ```bash
   gh auth login
