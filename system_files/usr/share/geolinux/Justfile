@@ -1,3 +1,6 @@
 # Opt-in GIS recipes shipped with geolinux.
 # Run: geolinux-gis --list
 import "build_files/60-gis.just"
+
+# Bare `geolinux-gis` shows what is installed instead of erroring.
+default: status
