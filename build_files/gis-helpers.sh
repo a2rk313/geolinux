@@ -45,15 +45,17 @@ gis_cpak() {
   local tmp base
   tmp="$(mktemp -d)"
   base="https://github.com/Containerpak/cpak/releases/latest/download"
-  curl -fsSL -o "${tmp}/cpak" "${base}/cpak-linux-${arch}"
-  curl -fsSL -o "${tmp}/cpak-storaged" "${base}/cpak-storaged-linux-${arch}"
+  # keep upstream's filenames: SHA256SUMS lists cpak-linux-<arch>, and
+  # sha256sum -c fails on any other name
+  curl -fsSL -o "${tmp}/cpak-linux-${arch}" "${base}/cpak-linux-${arch}"
+  curl -fsSL -o "${tmp}/cpak-storaged-linux-${arch}" "${base}/cpak-storaged-linux-${arch}"
   curl -fsSL -o "${tmp}/SHA256SUMS" "${base}/SHA256SUMS"
   (
     cd "${tmp}" || exit 1
     grep -E "  (cpak|cpak-storaged)-linux-${arch}$" SHA256SUMS > SHA256SUMS.part
     sha256sum -c SHA256SUMS.part
   )
-  install -Dm755 "${tmp}/cpak" "${HOME}/.local/bin/cpak"
-  install -Dm755 "${tmp}/cpak-storaged" "${HOME}/.local/bin/cpak-storaged"
+  install -Dm755 "${tmp}/cpak-linux-${arch}" "${HOME}/.local/bin/cpak"
+  install -Dm755 "${tmp}/cpak-storaged-linux-${arch}" "${HOME}/.local/bin/cpak-storaged"
   rm -rf "${tmp}"
 }
