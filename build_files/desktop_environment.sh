@@ -11,8 +11,9 @@ set -ouex pipefail
 
 # this installs a package from fedora repos
 # just runs the opt-in GIS recipes on the installed system (60-gis.just);
-# git and slirp4netns are runtime prerequisites for brew and cpak
-dnf5 install -y just git slirp4netns tmux fastfetch
+# git and slirp4netns are runtime prerequisites for brew and cpak; plymouth and
+# its default theme are what branding.sh rebrands and bakes into the initramfs
+dnf5 install -y just git slirp4netns tmux fastfetch plymouth plymouth-theme-spinner
 
 # apply the system_files overlay into the image (empty dir = no-op)
 cp -a /ctx/system_files/. /
