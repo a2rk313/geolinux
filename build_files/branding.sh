@@ -56,12 +56,18 @@ EOF
 # --- PLYMOUTH ---
 # The base image's initramfs predates the desktop packages, so the branded theme
 # only shows at boot after the initramfs is rebuilt here.
-PLYMOUTH_SRC="/usr/share/plymouth/themes/spinner"
+PLYMOUTH_ASSETS="/usr/share/plymouth/themes/spinner"
+PLYMOUTH_TEMPLATE=""
+if [[ -f /usr/share/plymouth/themes/bgrt/bgrt.plymouth ]]; then
+  PLYMOUTH_TEMPLATE="/usr/share/plymouth/themes/bgrt/bgrt.plymouth"
+elif [[ -f "$PLYMOUTH_ASSETS/spinner.plymouth" ]]; then
+  PLYMOUTH_TEMPLATE="$PLYMOUTH_ASSETS/spinner.plymouth"
+fi
 PLYMOUTH_THEME="/usr/share/plymouth/themes/geolinux"
-if [[ -d "$PLYMOUTH_SRC" ]]; then
+if [[ -d "$PLYMOUTH_ASSETS" && -n "$PLYMOUTH_TEMPLATE" ]]; then
   rm -rf "$PLYMOUTH_THEME"
-  cp -a "$PLYMOUTH_SRC" "$PLYMOUTH_THEME"
-  mv "$PLYMOUTH_THEME/spinner.plymouth" "$PLYMOUTH_THEME/geolinux.plymouth"
+  cp -a "$PLYMOUTH_ASSETS" "$PLYMOUTH_THEME"
+  cp "$PLYMOUTH_TEMPLATE" "$PLYMOUTH_THEME/geolinux.plymouth"
   sed -i \
     -e 's|^Name=.*|Name=Geolinux|' \
     -e 's|^Description=.*|Description=Geolinux boot splash|' \
@@ -69,6 +75,7 @@ if [[ -d "$PLYMOUTH_SRC" ]]; then
     -e 's|^WatermarkVerticalAlignment=.*|WatermarkVerticalAlignment=.42|' \
     -e 's|^DialogVerticalAlignment=.*|DialogVerticalAlignment=.85|' \
     -e 's|^TitleVerticalAlignment=.*|TitleVerticalAlignment=.85|' \
+    -e 's|^UseFirmwareBackground=.*|UseFirmwareBackground=false|' \
     "$PLYMOUTH_THEME/geolinux.plymouth"
   cp /ctx/logo/logo_small_256.png "${PLYMOUTH_THEME}/watermark.png"
   printf '[Daemon]\nTheme=geolinux\n' > /etc/plymouth/plymouthd.conf
@@ -88,7 +95,7 @@ if [[ -d "$PLYMOUTH_SRC" ]]; then
     echo "WARNING: no initramfs for '$KERNEL_VERSION', splash will not show" >&2
   fi
 else
-  echo "WARNING: Plymouth spinner theme not found, skipping"
+  echo "WARNING: Plymouth theme assets not found, skipping"
 fi
 
 # --- GNOME Logo menu extension override (only when the extension is present) ---
