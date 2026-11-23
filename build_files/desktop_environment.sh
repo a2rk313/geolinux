@@ -11,9 +11,8 @@ set -ouex pipefail
 
 # this installs a package from fedora repos
 # just runs the opt-in GIS recipes on the installed system (60-gis.just);
-# git and slirp4netns are runtime prerequisites for brew and cpak; gh lets cpak
-# read the SAGA package manifest from its private repo
-dnf5 install -y just git slirp4netns tmux gh fastfetch
+# git and slirp4netns are runtime prerequisites for brew and cpak
+dnf5 install -y just git slirp4netns tmux fastfetch
 
 # apply the system_files overlay into the image (empty dir = no-op)
 cp -a /ctx/system_files/. /

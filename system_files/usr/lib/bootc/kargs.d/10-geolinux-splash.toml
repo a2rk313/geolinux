@@ -1,0 +1,2 @@
+# Boot the graphical splash (Plymouth theme geolinux) instead of kernel messages
+kargs = ["rhgb", "quiet"]

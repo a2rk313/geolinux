@@ -54,13 +54,39 @@ cat >/etc/motd <<'EOF'
 EOF
 
 # --- PLYMOUTH ---
-PLYMOUTH_THEME="/usr/share/plymouth/themes/spinner"
-if [[ -d "$PLYMOUTH_THEME" ]]; then
-  cp /ctx/logo/logo_small_128.png "${PLYMOUTH_THEME}/watermark.png"
-  cp /ctx/logo/logo_small_128.png "${PLYMOUTH_THEME}/bgrt-fallback.png"
-  cp /ctx/logo/logo_small_128.png "${PLYMOUTH_THEME}/silverblue-watermark.png"
-  cp /ctx/logo/logo_small_128.png "${PLYMOUTH_THEME}/silverblue-logo.png"
-  echo "Plymouth branding applied"
+# The base image's initramfs predates the desktop packages, so the branded theme
+# only shows at boot after the initramfs is rebuilt here.
+PLYMOUTH_SRC="/usr/share/plymouth/themes/spinner"
+PLYMOUTH_THEME="/usr/share/plymouth/themes/geolinux"
+if [[ -d "$PLYMOUTH_SRC" ]]; then
+  rm -rf "$PLYMOUTH_THEME"
+  cp -a "$PLYMOUTH_SRC" "$PLYMOUTH_THEME"
+  mv "$PLYMOUTH_THEME/spinner.plymouth" "$PLYMOUTH_THEME/geolinux.plymouth"
+  sed -i \
+    -e 's|^Name=.*|Name=Geolinux|' \
+    -e 's|^Description=.*|Description=Geolinux boot splash|' \
+    -e "s|^ImageDir=.*|ImageDir=$PLYMOUTH_THEME|" \
+    -e 's|^WatermarkVerticalAlignment=.*|WatermarkVerticalAlignment=.42|' \
+    -e 's|^DialogVerticalAlignment=.*|DialogVerticalAlignment=.85|' \
+    -e 's|^TitleVerticalAlignment=.*|TitleVerticalAlignment=.85|' \
+    "$PLYMOUTH_THEME/geolinux.plymouth"
+  cp /ctx/logo/logo_small_256.png "${PLYMOUTH_THEME}/watermark.png"
+  printf '[Daemon]\nTheme=geolinux\n' > /etc/plymouth/plymouthd.conf
+
+  KERNEL_VERSION="$(rpm -q kernel --qf '%{VERSION}-%{RELEASE}.%{ARCH}\n' 2>/dev/null | sort -V | tail -1 || true)"
+  if [[ -n "$KERNEL_VERSION" && -f "/usr/lib/modules/${KERNEL_VERSION}/initramfs.img" ]]; then
+    DRACUT_ARGS=(--no-hostonly --kver "$KERNEL_VERSION" --reproducible
+      -f "/usr/lib/modules/${KERNEL_VERSION}/initramfs.img")
+    if [[ -d /usr/lib/dracut/modules.d/50ostree ]]; then
+      DRACUT_ARGS+=(--add ostree)
+    fi
+    export DRACUT_NO_XATTR=1
+    dracut "${DRACUT_ARGS[@]}"
+    chmod 0600 "/usr/lib/modules/${KERNEL_VERSION}/initramfs.img"
+    echo "Plymouth theme applied, initramfs rebuilt for $KERNEL_VERSION"
+  else
+    echo "WARNING: no initramfs for '$KERNEL_VERSION', splash will not show" >&2
+  fi
 else
   echo "WARNING: Plymouth spinner theme not found, skipping"
 fi

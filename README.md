@@ -6,7 +6,7 @@
 
 A Fedora bootc distro for the people who use GIS and Remote Sensing to make the world a better place. Built on [ublue-os/image-template](https://github.com/ublue-os/image-template) and [Fedora bootc](https://github.com/bootc-dev/bootc).
 
-The base image stays minimal: QGIS and GRASS are Flatpak apps and SAGA runs in a container, so the OS layer is small and updates stay fast. Everything heavier (GDAL/PROJ, PostGIS, Jupyter, ML stacks) is opt-in and lives in user space.
+The base image stays minimal: QGIS, GRASS and Zen Browser are Flatpak apps and SAGA runs in a container, so the OS layer is small and updates stay fast. Everything heavier (GDAL/PROJ, PostGIS, Jupyter, ML stacks) is opt-in and lives in user space.
 
 Available in two editions:
 
@@ -15,12 +15,13 @@ Available in two editions:
 | **Geolinux GNOME** | GNOME | Fedora bootc 45 | `ghcr.io/a2rk313/geolinux-gnome` |
 | **Geolinux KDE** | KDE Plasma | Fedora bootc 45 | `ghcr.io/a2rk313/geolinux-kde` |
 
-Both editions ship only the desktop's comps *mandatory+default* packages. The rest of the app set, including QGIS, is installed from Flathub by `geolinux-flatpak-setup.service` on boot.
+Both editions ship only the desktop's comps *mandatory+default* packages. The rest of the app set, including QGIS and Zen Browser, is installed from Flathub by `geolinux-flatpak-setup.service` on boot.
 
 ## Included Software
 
 - **QGIS** — Flathub Flatpak (`org.qgis.qgis`), installed on first boot. It bundles GRASS 8.4, GDAL and PROJ.
 - **GRASS GIS** — ships inside the QGIS Flatpak. The `grass` wrapper runs it and `GRASSBIN=/usr/bin/grass` points host Python tooling (`grass.script`) at it.
+- **Zen Browser** — Flathub Flatpak (`app.zen_browser.zen`), installed on first boot.
 - **SAGA GIS 9.9.3** — cpak package from `ghcr.io/a2rk313/geolinux-saga`, opt-in (it pulls a ~700 MB image on first run).
 - **Desktop apps** — most of each desktop's app set (GNOME apps, or Dolphin, Ark, Filelight, …) comes from Flathub as well, not RPMs.
 
@@ -44,11 +45,7 @@ No geospatial libraries, databases or Python stacks are baked into the image. Th
 
 ### Switch to Geolinux from an Existing bootc System
 
-The registry packages are private, so authenticate first:
-
 ```bash
-sudo podman login ghcr.io
-
 # GNOME edition
 sudo bootc switch ghcr.io/a2rk313/geolinux-gnome:latest
 
@@ -82,10 +79,9 @@ Boot the qcow2 in your VM manager of choice, or run it locally with `just run-vm
 
 - **QGIS** — launch `qgis` or pick it from the app menu. Plugins install from inside QGIS (*Plugins → Manage and Install Plugins*).
 - **GRASS** — `grass` on the command line, or the GRASS provider inside QGIS.
-- **SAGA** — the SAGA container image is private, so log in to GitHub first, then:
+- **SAGA** — install the cpak package (its image is publicly pullable):
 
   ```bash
-  gh auth login
   geolinux-gis install-saga
   ```
 

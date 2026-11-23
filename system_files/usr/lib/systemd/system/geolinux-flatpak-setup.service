@@ -6,9 +6,9 @@ After=network-online.target
 [Service]
 # Not a oneshot: the installer exits 0 even when Flathub is unreachable, so the
 # unit itself verifies the end state and retries on slow/flaky networks. When
-# QGIS is already installed the whole thing is a single local flatpak lookup.
+# QGIS and Zen are already installed the whole thing is a single local lookup.
 Type=simple
-ExecStart=/bin/sh -c 'flatpak info --system org.qgis.qgis >/dev/null 2>&1 || /usr/libexec/geolinux-flatpak-setup; flatpak info --system org.qgis.qgis >/dev/null 2>&1'
+ExecStart=/bin/sh -c 'installed() { flatpak info --system "$1" >/dev/null 2>&1; }; installed org.qgis.qgis && installed app.zen_browser.zen || /usr/libexec/geolinux-flatpak-setup; installed org.qgis.qgis && installed app.zen_browser.zen'
 Restart=on-failure
 RestartSec=2min
 
